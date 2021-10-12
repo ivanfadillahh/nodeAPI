@@ -1,0 +1,20 @@
+{
+  "name": "node_api",
+  "version": "1.0.0",
+  "description": "REST-API Node.js",
+  "main": "app/api.js",
+  "scripts": {
+    "start": "node app/api.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Muhammad Ivan Fadillah",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "md5": "^2.3.0",
+    "mysql": "^2.18.1"
+  }
+}
