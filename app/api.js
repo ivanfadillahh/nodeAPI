@@ -160,7 +160,7 @@ app.post("/api/v1/create/user", (req, res) => {
         conn.query(query, (error, results) => {
             conn.release();
 
-            if(error || results == "" || results == null){
+            if(error || results == ""){
                 res.status(400).send(no_user);
             }
             else{
