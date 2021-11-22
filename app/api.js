@@ -210,3 +210,78 @@ app.post("/api/v1/create/user", (req, res) => {
         });
     });
 });
+
+// api delete user with auth token admin
+app.delete("/api/v1/delete_user/:id", (req, res) => {
+    let header = req.header("token");
+    let userid = req.params['id'];
+    
+    let err_con = {
+        "code": 500,
+        "msg": "Error database connection!"
+    };
+    let err_token = {
+        "code": 404,
+        "msg": "Token not found!"
+    };
+    let err_del = {
+        "code": 400,
+        "msg": "Error deleting user!"
+    };
+    let succ_del = {
+        "code": 200,
+        "msg": "Success deleting user"
+    };
+    let adm_pls = {
+        "code": 400,
+        "msg": "Need administrator access!"
+    }
+
+    pool.getConnection((err, conn) => {
+        if(err){
+            res.status(500).send(err_con);
+        }
+
+        let queryt = `select role from users where token='${header}'`;
+
+        conn.query(queryt, (error, results) => {
+            conn.release();
+
+            if(error || results == ""){
+                res.status(404).send(err_token);
+            }
+            else{
+                Object.keys(results).forEach(function(key) {
+                    var row = results[key];
+                    if(row.role == 1){
+                        pool.getConnection((ers, cons) => {
+                            if(ers){
+                                res.status(500).send(err_con);
+                            }
+
+                            let query = `delete from users where id=${userid}`;
+
+                            cons.query(query, (erss, resz) => {
+                                cons.release();
+
+                                if(erss || resz == ""){
+                                    res.status(400).send(err_del);
+                                }
+                                res.status(200).send(succ_del);
+                            });
+
+                        });
+                    }
+                    else{
+                        res.status(400).send(adm_pls);
+                    }
+                });
+            }
+        });
+    });
+});
+
+// api update user with token admin
+app.patch("api/v1/update_user/:id", (req,res) => {
+    
+});

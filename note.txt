@@ -1,0 +1,6 @@
+API NOTE :
+** API Login
+** API Logout
+** API Create user with token admin
+** API Delete user with token admin
+** API Update user with token admin
