@@ -282,6 +282,75 @@ app.delete("/api/v1/delete_user/:id", (req, res) => {
 });
 
 // api update user with token admin
-app.patch("api/v1/update_user/:id", (req,res) => {
-    
+app.patch("/api/v1/update_user/:id", (req,res) => {
+    let header = req.header("token");
+    let userid = req.params['id'];
+
+    let body = req.body;
+    let name = body["name"];
+    let email = body["email"];
+
+    let err_db = {
+        "code": 500,
+        "msg": "Connection fail!"
+    }
+    let err_nofound = {
+        "code": 404,
+        "msg": "Token not found!"
+    }
+    let err_adm = {
+        "code": 400,
+        "msg": "Need administrator access!"
+    }
+    let err_up_usr = {
+        "code": 400,
+        "msg": "Error updating user"
+    }
+    let succ_up_usr = {
+        "code": 200,
+        "msg": "Success updating user"
+    }
+
+    pool.getConnection((error, connection) =>{
+        if(error){
+            res.status(500).send(err_db);
+        }
+
+        let queryadm = `select role from users where token='${header}'`;
+
+        connection.query(queryadm, (err, result) =>{
+            connection.release();
+
+            if(err || result == ""){
+                res.status(404).send(err_nofound);
+            }
+            else{
+                Object.keys(result).forEach(function(key) {
+                    var rows = result[key];
+                    if(rows.role == 1){
+                        pool.getConnection((errs, conn) => {
+                            if(errs){
+                                res.status(500).send(err_db);
+                            }
+
+                            let query = `update users set name='${name}',email='${email}' where id='${userid}'`;
+
+                            conn.query(query, (ers, results) => {
+                                conn.release();
+
+                                if(ers || results == ""){
+                                    res.status(400).send(err_up_usr);
+                                }
+                                res.status(200).send(succ_up_usr);
+                            })
+                        });
+                    }
+                    else{
+                        res.status(400).send(err_adm);
+                    }
+                });
+            }
+        });
+    });
+
 });
